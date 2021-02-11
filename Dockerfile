@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk add --no-cache python2 && apk add --no-cache py-pip
+RUN apk add --no-cache python3 && apk add --no-cache py-pip
 
 COPY fwatchdog /usr/bin/fwatchdog
 
