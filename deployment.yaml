@@ -31,3 +31,6 @@ spec:
           image: mabutkovic/service2:latest
           ports:
             - containerPort: 8080
+          env:
+            - name: SERVICE1_URL
+              value: "http://service1-svc:8080"
