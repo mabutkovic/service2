@@ -1,11 +1,13 @@
-def list_projects = ["Project1", "Project2"]
-def list_environments = ["Staging", "Prod"]
+def list_projects = ["p1", "p2"]
+def list_environments = ["staging", "prod"]
+def list_project_names = ["project1", "project2"]
 pipeline {
     agent any
     environment {
         VERSION_NUMBER = sh(script: 'cat version.txt ', returnStdout: true).trim()
     }
     stages {
+
         stage('Build') {
             steps {
                 script {
@@ -35,57 +37,35 @@ pipeline {
                 }
             }
         }
-        stage('Projects') {
-            parallel {
-                stage('Project1') {
-                    stages {
-                        stage('Deploy to Staging') {
-                            steps {
-                                sh(script: "source /etc/profile; helm upgrade --set version=$VERSION_NUMBER --set SERVICE1_URL=http://project1-staging-service1-svc:8080 -f service2-workflow/values.p1.staging.yaml p1-staging-service2-workflow ./service2-workflow")
+
+        stage('Deployment Stage') {
+
+            steps {
+                script {
+                    for (int i = 0; i < list_projects.size(); i++) {
+                        for (int j = 0; j < list_environments.size(); j++) {
+
+                            stage(list_projects[i] + '-' + list_environments[j] + ' deploy') {
+                                sh(script: "source /etc/profile; helm upgrade --set version=$VERSION_NUMBER --set SERVICE1_URL=http://"+list_project_names[i]+"-staging-service1-svc:8080 -f service2-workflow/values." + list_projects[i] + "." + list_environments[j] + ".yaml " + list_projects[i] + "-" + list_environments[j] + "-service2-workflow ./service2-workflow")
                             }
-                        }
-                        stage('Smoke Test') {
-                            steps {
-                                echo "Executing this stage first"
+                            if (list_environments[j] == 'staging') {
+                                stage(list_projects[i] + '-' + list_environments[j] + ' Smoke Test') {
+                                    script {
+                                        echo "Executing"
+                                    }
+                                }
+                                stage(list_projects[i] + '-' + list_environments[j] + ' End to End Test') {
+                                    script {
+                                        echo "Executing"
+                                    }
+                                }
                             }
-                        }
-                        stage('End to End Test') {
-                            steps {
-                                echo "Executing this stage first"
-                            }
-                        }
-                        stage('Deploy to Production') {
-                            steps {
-                                sh(script: "source /etc/profile; helm upgrade --set version=$VERSION_NUMBER --set SERVICE1_URL=http://project1-prod-service1-svc:8080 -f service2-workflow/values.p1.prod.yaml p1-prod-service2-workflow ./service2-workflow")
-                            }
-                        }
-                    }
-                }
-                stage('Project2') {
-                    stages {
-                        stage('Deploy to Staging') {
-                            steps {
-                                sh(script: "source /etc/profile; helm upgrade --set version=$VERSION_NUMBER --set SERVICE1_URL=http://project2-staging-service1-svc:8080 -f service2-workflow/values.p2.staging.yaml p2-staging-service2-workflow ./service2-workflow")
-                            }
-                        }
-                        stage('Smoke Test') {
-                            steps {
-                                echo "Executing this stage first"
-                            }
-                        }
-                        stage('End to End Test') {
-                            steps {
-                                echo "Executing this stage first"
-                            }
-                        }
-                        stage('Deploy to Production') {
-                            steps {
-                                sh(script: "source /etc/profile; helm upgrade --set version=$VERSION_NUMBER --set SERVICE1_URL=http://project2-prod-service1-svc:8080 -f service2-workflow/values.p2.prod.yaml p2-prod-service2-workflow ./service2-workflow")
-                            }
+
                         }
                     }
                 }
             }
         }
+
     }
 }
