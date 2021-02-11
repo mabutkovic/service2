@@ -1,4 +1,6 @@
-FROM python:3.9.1-slim-buster
+FROM alpine
+
+RUN apk add --no-cache python2 && apk add --no-cache py-pip
 
 COPY fwatchdog /usr/bin/fwatchdog
 
