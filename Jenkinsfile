@@ -1,7 +1,15 @@
+def list_projects
+def list_environments
 pipeline {
     agent any
     environment {
         VERSION_NUMBER = sh(script: 'cat version.txt ', returnStdout: true).trim()
+    }
+    stages{
+        stage(){
+            list_projects = ["Project1", "Project2"]
+            list_environments = ["Staging", "Prod"]
+        }
     }
     stages {
         stage('Build') {
