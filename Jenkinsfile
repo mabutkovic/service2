@@ -51,7 +51,7 @@ pipeline {
                                 stage(list_projects[i] + '-' + list_environments[j] + ' Smoke Test') {
                                     script {
                                         sleep(time:3,unit:"SECONDS")
-                                        sh(script: "source /etc/profile; python3 tests/test.py service1 "+list_projects[i]+" "+list_environments[j])                                    }
+                                        sh(script: "source /etc/profile; python3 tests/test.py service2 "+list_projects[i]+" "+list_environments[j])                                    }
                                 }
                                 stage(list_projects[i] + '-' + list_environments[j] + ' End to End Test') {
                                     script {
