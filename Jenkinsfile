@@ -47,7 +47,7 @@ pipeline {
                             stage(list_projects[i] + '-' + list_environments[j] + ' deploy') {
                                 sh(script: "source /etc/profile; helm upgrade --install --set version=$VERSION_NUMBER --set SERVICE1_URL=http://"+list_projects[i]+"-staging-service1-svc:8080 -f service2-workflow/values." + list_projects[i] + "." + list_environments[j] + ".yaml " + list_projects[i] + "-" + list_environments[j] + "-service2-workflow ./service2-workflow")
                             }
-                            if (list_environments[j] == 'staging') {
+                            if (list_environments[j] in ['staging']) {
                                 stage(list_projects[i] + '-' + list_environments[j] + ' Smoke Test') {
                                     script {
                                         sleep(time:3,unit:"SECONDS")
